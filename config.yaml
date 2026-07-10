@@ -1,0 +1,94 @@
+# =============================================================================
+# SenaHill Weekly Fintech Digest — configuration
+# 100% free to run: no API keys, no paid services. Only a Slack webhook (free).
+# Edit this file to tune coverage and formatting. No code changes needed.
+# =============================================================================
+
+settings:
+  # Only include stories published within this many days of the run.
+  lookback_days: 7
+  # Max candidate articles to consider (keeps things fast).
+  max_candidates: 250
+  # Max stories shown per section in the final digest.
+  max_stories_per_section: 8
+  # How many "top reads" to feature at the top (0 to disable).
+  highlights_count: 5
+  # Header shown in Slack. {start} and {end} are filled in with the date range.
+  header: "SenaHill Fintech Weekly — {start} to {end}"
+  # Timezone for date labels (IANA name).
+  timezone: "America/New_York"
+
+# Sections, in the order they appear in Slack. Names must match the `section`
+# labels used in google_news_queries and section_keywords below.
+sections:
+  - "🤖 AI in Fintech"
+  - "💳 Payments"
+  - "₿ Digital Assets & Tokenization"
+  - "🦄 Deals, Funding & M&A"
+
+# -----------------------------------------------------------------------------
+# Google News RSS searches — the backbone (free, no key, international).
+# Each query is tagged with the section it feeds, so stories are categorised
+# accurately at the source. The code auto-limits each to the lookback window.
+# Add `gl` codes (GB, SG, IN, BR, AE, ...) to widen regional coverage.
+# -----------------------------------------------------------------------------
+google_news_queries:
+  - section: "🤖 AI in Fintech"
+    q: '(fintech OR "financial services" OR banking) (AI OR "artificial intelligence" OR "machine learning")'
+    gl: "US"
+  - section: "🤖 AI in Fintech"
+    q: '(fintech OR bank) ("AI agent" OR agentic OR automation OR underwriting OR fraud)'
+    gl: "GB"
+  - section: "💳 Payments"
+    q: 'payments (fintech OR bank OR "cross-border" OR "real-time" OR "instant payments")'
+    gl: "US"
+  - section: "💳 Payments"
+    q: '(Visa OR Mastercard OR Stripe OR Adyen OR "embedded finance") (launch OR partnership OR deal OR expansion)'
+    gl: "US"
+  - section: "₿ Digital Assets & Tokenization"
+    q: '(stablecoin OR "digital assets" OR tokenization OR "real-world assets" OR RWA) (regulation OR launch OR partnership OR institutional)'
+    gl: "US"
+  - section: "₿ Digital Assets & Tokenization"
+    q: '(crypto OR blockchain) (bank OR payments OR custody OR ETF OR treasury OR tokenized)'
+    gl: "US"
+  - section: "🦄 Deals, Funding & M&A"
+    q: 'fintech (raises OR funding OR "Series A" OR "Series B" OR "Series C" OR valuation OR unicorn)'
+    gl: "US"
+  - section: "🦄 Deals, Funding & M&A"
+    q: 'fintech (acquisition OR acquires OR merger OR IPO OR "goes public")'
+    gl: "GB"
+  - section: "🦄 Deals, Funding & M&A"
+    q: 'fintech (raises OR funding OR acquisition) (Europe OR Asia OR Africa OR "Latin America" OR India OR Singapore)'
+    gl: "SG"
+
+# -----------------------------------------------------------------------------
+# Direct RSS feeds — trusted primary outlets. These are general feeds, so their
+# stories are sorted by the keyword rules below. Any feed that fails to load is
+# skipped silently, so a dead URL never breaks the run.
+# -----------------------------------------------------------------------------
+rss_feeds:
+  - "https://www.finextra.com/rss/headlines.aspx"
+  - "https://www.pymnts.com/feed/"
+  - "https://www.ledgerinsights.com/feed/"
+  - "https://www.coindesk.com/arc/outboundfeeds/rss/"
+  - "https://sifted.eu/feed"
+  - "https://techcrunch.com/category/fintech/feed/"
+
+# -----------------------------------------------------------------------------
+# Keyword rules used to sort stories from the general RSS feeds into a section.
+# A story goes to the highest-scoring section; ties break by the priority order.
+# Stories matching nothing are dropped (keeps noise down).
+# -----------------------------------------------------------------------------
+section_keywords:
+  "🤖 AI in Fintech": ["ai", "artificial intelligence", "machine learning", "agent", "agentic", "llm", "genai", "copilot", "model"]
+  "💳 Payments": ["payment", "payments", "visa", "mastercard", "stripe", "adyen", "cross-border", "remittance", "card", "wallet", "checkout", "acquirer", "psp", "swift", "iso 20022"]
+  "₿ Digital Assets & Tokenization": ["crypto", "stablecoin", "token", "tokeniz", "blockchain", "digital asset", "rwa", "bitcoin", "ethereum", "solana", "custody", "defi", "on-chain", "onchain"]
+  "🦄 Deals, Funding & M&A": ["raise", "raised", "raises", "funding", "series a", "series b", "series c", "series d", "seed round", "valuation", "unicorn", "acquire", "acquisition", "merger", "ipo"]
+
+# Tie-break priority when a story matches multiple sections (first wins).
+# Funding signals win so a "raises $X for AI" story lands in Deals, not AI.
+section_priority:
+  - "🦄 Deals, Funding & M&A"
+  - "₿ Digital Assets & Tokenization"
+  - "💳 Payments"
+  - "🤖 AI in Fintech"
