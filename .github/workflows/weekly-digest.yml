@@ -1,0 +1,29 @@
+name: Weekly Fintech Digest
+
+on:
+  schedule:
+    # 11:00 UTC every Monday = 7:00am ET (EDT) / 6:00am ET (EST).
+    # Change the day-of-week (last field: 0=Sun..6=Sat) or hour as you like.
+    # cron is always UTC and does not observe daylight saving.
+    - cron: "0 11 * * 1"
+  workflow_dispatch: {}   # lets you trigger a run manually from the Actions tab
+
+concurrency:
+  group: fintech-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -r requirements.txt
+      - name: Build and post digest
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python digest.py
